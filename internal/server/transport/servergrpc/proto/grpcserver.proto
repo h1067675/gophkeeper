@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package servergrpc;
+
+option go_package = "servergrpc/proto";
+
+service GothKeeper {
+
+}
+
