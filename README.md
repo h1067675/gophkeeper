@@ -1,2 +1,8 @@
-# gophkeeper
-Client-server system for storing confidential user data.
+
+# Дипломный проект GothKeeper
+
+
+# Как построена система
+
+![Структура базы данных сервера](/docs/server_db.png)
+![Структура базы данных клиента](/docs/client_db.png)
