@@ -26,7 +26,7 @@ type secretModel struct {
 }
 
 // newsecretModel инициализирует модель экрана установки пароля шифрования
-func newsecretModel() secretModel {
+func newsecretModel() *secretModel {
 	pass1 := textinput.New()
 	pass1.Placeholder = "Пароль"
 	pass1.Focus()
@@ -38,7 +38,7 @@ func newsecretModel() secretModel {
 	pass2.CharLimit = 32
 	pass2.Width = 30
 
-	return secretModel{
+	return &secretModel{
 		password: pass1,
 		repeat:   pass2,
 		keys:     DefaultKeyMap(),

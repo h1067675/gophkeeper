@@ -5,7 +5,6 @@
 // -a  :   Host for runing servers
 // -b  :   Port for runing HTTPS server
 // -c  :   Port for runing GRPC server
-// -d  :   Data Source Name for accessing the database
 // -n  :   Company name
 // -h  :   SMTP email host
 // -sp :   SMTP email port
@@ -35,17 +34,9 @@ import (
 )
 
 func main() {
-	domain := "localhost"
-	httpsport := "8853"
-	grpcport := "8803"
-	databaseDNS := "host=127.0.0.1 port=5432 dbname=postgres user=postgres password=12345678 connect_timeout=10 sslmode=prefer"
-	companyName := "GophKeeper - password and data saver"
-	smtphost := ""
-	smtpport := ""
-	email := ""
 	dropDBTables := false // используется для тестирования и отладки во время разработки
 
-	application, err := app.NewApplication(domain, httpsport, grpcport, databaseDNS, companyName, smtphost, smtpport, email, dropDBTables)
+	application, err := app.NewApplication(dropDBTables)
 	if err != nil {
 		fmt.Printf("Error initialize application.\nGophKeeper stopped.")
 		return

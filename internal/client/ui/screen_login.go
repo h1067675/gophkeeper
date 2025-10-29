@@ -5,6 +5,7 @@ package ui
 
 import (
 	"fmt"
+	"gophkeeper/pkg/domain"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -18,16 +19,16 @@ type loginModel struct {
 	keys KeyMap
 	help help.Model
 
-	login      textinput.Model
-	pass       textinput.Model
-	err        string
-	focus      int
-	done       bool
-	toRegister bool
+	login textinput.Model
+	pass  textinput.Model
+	err   string
+	focus int
+	done  bool
+	next  domain.Screen
 }
 
 // newLoginModel инициализирует модель экрана авторизации пользователя
-func newLoginModel() loginModel {
+func newLoginModel() *loginModel {
 	login := textinput.New()
 	login.Placeholder = "Имя пользователя"
 	login.Focus()
@@ -41,21 +42,22 @@ func newLoginModel() loginModel {
 	pass.EchoCharacter = '•'
 	pass.Width = 30
 
-	return loginModel{
+	return &loginModel{
 		login: login,
 		pass:  pass,
 		keys:  DefaultKeyMap(),
 		help:  help.New(),
+		next:  -1,
 	}
 }
 
 // Update обновляет данные полей и реализует основную логику экрана
-func (m loginModel) Update(msg tea.Msg) (loginModel, tea.Cmd, bool, bool) {
+func (m loginModel) Update(msg tea.Msg) (loginModel, tea.Cmd, bool) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "tab":
+		switch {
+		case key.Matches(msg, m.keys.Tab):
 			m.focus++
 			if m.focus > 1 {
 				m.focus = 0
@@ -67,28 +69,22 @@ func (m loginModel) Update(msg tea.Msg) (loginModel, tea.Cmd, bool, bool) {
 				m.pass.Focus()
 				m.login.Blur()
 			}
-		case "ctrl+r":
-			m.toRegister = true
-			return m, nil, false, true
-		case "enter":
-			if m.login.Value() == "" {
-				m.err = "Ошибка! Логин не может быть пустым"
-				return m, nil, false, false
-			}
-			if m.pass.Value() == "" {
-				m.err = "Ошибка! Пароль не может быть пустым"
-				return m, nil, false, false
-			}
-			m.done = true
-			return m, nil, true, false
-		case "esc", "ctrl+c":
-			return m, tea.Quit, false, false
+		case key.Matches(msg, m.keys.Register):
+			m.next = domain.ScreenRegister
+			return m, nil, true
+		case key.Matches(msg, m.keys.Enter):
+			return m, nil, true
+		case key.Matches(msg, m.keys.Quit):
+			return m, tea.Quit, false
+		case key.Matches(msg, m.keys.Back):
+			m.next = domain.ScreenStart
+			return m, nil, true
 		}
 	}
 
 	m.login, _ = m.login.Update(msg)
 	m.pass, _ = m.pass.Update(msg)
-	return m, cmd, false, false
+	return m, cmd, false
 }
 
 // View перерисовывает экран после обновления

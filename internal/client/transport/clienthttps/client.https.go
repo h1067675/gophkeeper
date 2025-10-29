@@ -5,12 +5,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"gophkeeper/pkg/domain"
-	"gophkeeper/pkg/errors"
 	"io"
 	"net/http"
 	"os"
 	"strings"
+
+	"gophkeeper/pkg/domain"
+	"gophkeeper/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -104,7 +105,7 @@ func (c Client) Registration(user *domain.User) (textErr string, err error) {
 	if err != nil {
 		return "", err
 	}
-	req, err := c.newPost("/api/user/registration", string(js))
+	req, err := c.newPost(domain.RouteUser+domain.RouteUserRegistration, string(js))
 	if err != nil {
 		return "", err
 	}
@@ -136,7 +137,7 @@ func (c Client) Authorization(user *domain.User) (textErr string, err error) {
 	if err != nil {
 		return "", err
 	}
-	req, err := c.newPost("/api/user/authorization", string(js))
+	req, err := c.newPost(domain.RouteUser+domain.RouteUserAuthorization, string(js))
 	if err != nil {
 		return "", err
 	}
@@ -170,7 +171,7 @@ func (c Client) TOTPConfirmation(user *domain.User, code string) (textErr string
 	if err != nil {
 		return "", err
 	}
-	req, err := c.newPost("/api/user/totp", string(js))
+	req, err := c.newPost(domain.RouteUser+domain.RouteUserTOTP, string(js))
 	if err != nil {
 		return "", err
 	}
@@ -200,7 +201,7 @@ func (c Client) TOTPUpdate(user *domain.User, code string) (textErr string, err 
 	if err != nil {
 		return "", err
 	}
-	req, err := c.newPost("/api/user/totp-update", string(js))
+	req, err := c.newPost(domain.RouteUser+domain.RouteUserTOTPUpdate, string(js))
 	if err != nil {
 		return "", err
 	}
@@ -227,7 +228,7 @@ func (c Client) SaveHashSecretPassword(user domain.User, hash string) (textErr s
 	if err != nil {
 		return "", err
 	}
-	req, err := c.newPost("/api/user/save-hash", string(js))
+	req, err := c.newPost(domain.RouteUser+domain.RouteUserSavePassHash, string(js))
 	if err != nil {
 		return "", err
 	}
@@ -252,7 +253,7 @@ func (c Client) SyncData(dataOut domain.SyncPayload) (domain.SyncPayload, string
 	if err != nil {
 		return domain.SyncPayload{}, "", err
 	}
-	req, err := c.newPost("/api/sync", string(js))
+	req, err := c.newPost(domain.RouteSync, string(js))
 	if err != nil {
 		return domain.SyncPayload{}, "", err
 	}

@@ -32,7 +32,7 @@ type totpModel struct {
 }
 
 // newTOTPModel инициализирует модель экрана двухфакторной авторизации
-func newTOTPModel(qr string) totpModel {
+func newTOTPModel() *totpModel {
 	code := textinput.New()
 	code.Placeholder = "Код подтверждения"
 	code.Focus()
@@ -52,12 +52,11 @@ func newTOTPModel(qr string) totpModel {
 	ims = append(ims, item{title: "Показать QR-код Google Authenticator", make: 5, show: false})
 	ims = append(ims, item{title: "Выйти", make: -1, show: true})
 
-	return totpModel{
+	return &totpModel{
 		code:  code,
 		email: email,
 		keys:  DefaultKeyMap(),
 		help:  help.New(),
-		qr:    qr,
 		items: ims,
 	}
 }

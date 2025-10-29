@@ -56,7 +56,7 @@ const (
 )
 
 // newBinaryModel инициализирует модель экрана работы с бинарными данными пользователя
-func newBinaryModel() binaryModel {
+func newBinaryModel() *binaryModel {
 	var inputs []textinput.Model = make([]textinput.Model, bdesc+1)
 
 	inputs[bocalid] = textinput.New()
@@ -80,12 +80,13 @@ func newBinaryModel() binaryModel {
 	inputs[bdesc].Width = 50
 	inputs[bdesc].Prompt = ""
 
-	return binaryModel{
+	return &binaryModel{
 		keys:       DefaultKeyMap(),
 		help:       help.New(),
 		inputs:     inputs,
 		index:      -1,
 		viewHeight: 8,
+		width:      6,
 	}
 }
 

@@ -162,43 +162,43 @@ func (g *Service) UpdateTOTPRegistration(ctx context.Context, session string, em
 }
 
 // UserAuthorization осуществляет авторизацию пользователя по паролю
-func (g *Service) UserAuthorization(ctx context.Context, login string, password string) (string, time.Time, string, string, error) {
+func (g *Service) UserAuthorization(ctx context.Context, login string, password string) (string, string, time.Time, string, string, error, error) {
 	// валидируем данные регистрации
 	user := domain.User{Login: login, Password: password}
 	if err := user.Validate(); err != nil {
 		if !errors.Is(err, errors.ErrUserInvalidEmail) {
-			return "", time.Time{}, "", "", errors.ErrUserAuthorization
+			return "", "", time.Time{}, "", "", errors.ErrUserAuthorization, nil
 		}
 	}
 	// сверяем данные пользователя с базой данных
 	userID, hash, saltb64, spassHash, err := g.Repository.UserAuthorization(user.Login)
 	if err != nil {
-		return "", time.Time{}, "", "", errors.ErrUserAuthorization
+		return "", "", time.Time{}, "", "", errors.ErrUserAuthorization, err
 	}
 	// хэшируем пароль пользователя
 	ok, err := g.Crypter.CompareHash(user.Password, hash)
 	if err != nil || !ok {
-		return "", time.Time{}, "", "", errors.ErrUserAuthorization
+		return "", "", time.Time{}, "", "", errors.ErrUserAuthorization, err
 	}
 	user.Password, user.ID = hash, userID
 	// проверяем наличие кода постоянной сессии в базе данных
 	session, secretKey, expire, err := g.Repository.SessionGet(user.ID)
 	if err != nil {
-		return "", time.Time{}, "", "", err
+		return "", "", time.Time{}, "", "", errors.ErrUserAuthorization, err
 	}
 	if session == "" || time.Now().After(expire) || secretKey == "" {
-		return session, expire, "", "", errors.ErrTOTPExpired
+		return domain.APIv1 + domain.RouteUserTOTPUpdate, session, expire, "", "", errors.ErrTOTPExpired, err
 	}
 	token, err := g.CreateTokenSession(session)
 	if err != nil {
-		return "", time.Time{}, "", "", err
+		return "", "", time.Time{}, "", "", nil, err
 	}
 	if spassHash == "" {
-		return token, expire, "", "", errors.ErrUserSecretPassword
+		return domain.APIv1 + domain.RouteUserSavePassHash, token, expire, "", "", errors.ErrUserSecretPassword, nil
 	}
 
 	// возвращаем хэндлеру код временной сессии срок действия
-	return token, expire, saltb64, spassHash, nil
+	return "", token, expire, saltb64, spassHash, nil, nil
 }
 
 // UserSavePasswordHash сохраняет строку сессии защифрованную при помощи пароля шифрования пользователя и уникальной соли

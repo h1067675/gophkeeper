@@ -32,9 +32,9 @@ type startModel struct {
 }
 
 // newStartModel инициализирует модель стартового экрана
-func newStartModel() startModel {
+func newStartModel() *startModel {
 
-	return startModel{
+	return &startModel{
 		keys: DefaultKeyMap(),
 		help: help.New(),
 	}

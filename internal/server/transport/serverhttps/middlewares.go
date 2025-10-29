@@ -4,6 +4,7 @@ package serverhttps
 import (
 	"compress/gzip"
 	"context"
+	"gophkeeper/pkg/domain"
 	"io"
 	"net/http"
 	"strings"
@@ -75,7 +76,7 @@ func (s *Server) AuthorizationTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 		var ctx context.Context
 		var session string
-		if strings.Contains(request.RequestURI, "registration") || strings.Contains(request.RequestURI, "authorization") {
+		if strings.Contains(request.RequestURI, domain.RouteUserRegistration) || strings.Contains(request.RequestURI, domain.RouteUserAuthorization) {
 			next.ServeHTTP(response, request)
 			return
 		}
@@ -94,7 +95,7 @@ func (s *Server) AuthorizationTokenMiddleware(next http.Handler) http.Handler {
 			response.WriteHeader(http.StatusForbidden)
 			return
 		}
-		// тередаем id сессии в хандлер
+		// передаем id сессии в хандлер
 		ctx = context.WithValue(request.Context(), ctxName, session)
 
 		next.ServeHTTP(response, request.WithContext(ctx))

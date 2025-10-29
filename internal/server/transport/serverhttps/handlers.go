@@ -136,7 +136,7 @@ func (s *Server) TOTPUpdateHandler(response http.ResponseWriter, request *http.R
 		return
 	}
 	// формируем ответ в json и отправляем
-	result := domain.JSONRegistrationResponse{Redirect: "/api/user/totp", TOTPurl: totp}
+	result := domain.JSONRegistrationResponse{Redirect: domain.APIv1 + domain.RouteUserTOTP, TOTPurl: totp}
 	body, err := json.Marshal(result)
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
@@ -158,27 +158,22 @@ func (s *Server) UserAuthorizationHandler(response http.ResponseWriter, request 
 		return
 	}
 	// если данные получены, то отправляем их в основную функцию
-	session, expire, saltb64, spassHash, errAuth := s.GophKeeper.UserAuthorization(request.Context(), reqAuthorization.Login, reqAuthorization.Password)
-	if errAuth != nil && !errors.Is(errAuth, errors.ErrTOTPExpired) && !errors.Is(errAuth, errors.ErrUserSecretPassword) {
-		if errors.Is(errAuth, errors.ErrUserAuthorization) {
-			response.WriteHeader(http.StatusForbidden)
-			if body, err := GetErrorJSON(errAuth); err == nil {
-				response.Write(body)
-			}
-			return
+	redirect, session, expire, saltb64, spassHash, errInf, errSys := s.GophKeeper.UserAuthorization(request.Context(), reqAuthorization.Login, reqAuthorization.Password)
+	if errInf != nil {
+		response.WriteHeader(http.StatusForbidden)
+		if body, err := GetErrorJSON(errInf); err == nil {
+			response.Write(body)
 		}
+		return
+	}
+	if errSys != nil {
 		response.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	// формируем ответ в json
-	result := domain.JSONAuthorizationResponse{Redirect: "/api/user/totp", Token: session, Expire: int(expire.Unix()), SaltB64: saltb64, SPassHash: spassHash}
+	result := domain.JSONAuthorizationResponse{Redirect: redirect, Token: session, Expire: int(expire.Unix()), SaltB64: saltb64, SPassHash: spassHash}
 	statusCode = http.StatusOK
-	if errors.Is(errAuth, errors.ErrTOTPExpired) {
-		result.Redirect = "/api/user/totp-update"
-		statusCode = http.StatusTemporaryRedirect
-	}
-	if errors.Is(errAuth, errors.ErrUserSecretPassword) {
-		result.Redirect = "/api/user/save-hash"
+	if redirect != "" {
 		statusCode = http.StatusTemporaryRedirect
 	}
 
@@ -187,6 +182,7 @@ func (s *Server) UserAuthorizationHandler(response http.ResponseWriter, request 
 		response.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
 	response.WriteHeader(statusCode)
 	response.Write(body)
 }

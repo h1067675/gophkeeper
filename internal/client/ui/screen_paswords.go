@@ -48,7 +48,7 @@ const (
 )
 
 // newPasswordsModel инициализирует модель экран работы с данными паролей пользователя
-func newPasswordsModel() passwordsModel {
+func newPasswordsModel() *passwordsModel {
 	var inputs []textinput.Model = make([]textinput.Model, pdesc+1)
 
 	inputs[plocalid] = textinput.New()
@@ -79,7 +79,7 @@ func newPasswordsModel() passwordsModel {
 	inputs[pdesc].Width = 35
 	inputs[pdesc].Prompt = ""
 
-	return passwordsModel{
+	return &passwordsModel{
 		keys:   DefaultKeyMap(),
 		help:   help.New(),
 		inputs: inputs,

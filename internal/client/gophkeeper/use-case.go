@@ -9,7 +9,11 @@ import (
 )
 
 // SaveServerConficuration сохраняет конфигурацию предоставленную пользователем
-func (g *Service) SaveServerConficuration(serverAddress, grpcport, httpport string) (err error) {
+func (g *Service) SaveServerConfiguration(serverAddress, grpcport, httpport string) (err error) {
+	// проверяем правильность указания адресов
+	if err := errors.Join(g.Configurer.CheckNetAddress(serverAddress+":"+httpport), g.Configurer.CheckNetAddress(serverAddress+":"+grpcport)); err != nil {
+		return errors.ErrInvalideNetAddress
+	}
 	err = g.Configurer.SetConfig(serverAddress, grpcport, httpport)
 	if err != nil {
 		return err

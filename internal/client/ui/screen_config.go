@@ -30,7 +30,7 @@ type configModel struct {
 }
 
 // newConfigModel инициализирует модель экран работы с данными банковских карт пользователя
-func newConfigModel() configModel {
+func newConfigModel() *configModel {
 	server := textinput.New()
 	server.Placeholder = "Сервер"
 	server.Focus()
@@ -47,12 +47,13 @@ func newConfigModel() configModel {
 	h.CharLimit = 32
 	h.Width = 30
 
-	return configModel{
+	return &configModel{
 		keys:      DefaultKeyMap(),
 		server:    server,
 		GRPCport:  g,
 		HTTPSport: h,
 		help:      help.New(),
+		next:      -1,
 	}
 }
 
@@ -80,18 +81,11 @@ func (m configModel) Update(msg tea.Msg) (configModel, tea.Cmd, bool) {
 			}
 		case key.Matches(msg, m.keys.Back):
 			m.next = domain.ScreenStart
+			return m, nil, true
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit, false
 		case key.Matches(msg, m.keys.Enter):
 			m.next = domain.ScreenLogin
-			if m.server.Value() == "" {
-				m.err = "Ошибка! Адрес сервера не может быть пустым"
-				return m, nil, false
-			}
-			if m.GRPCport.Value() == "" && m.HTTPSport.Value() == "" {
-				m.err = "Ошибка! Один из портов обязательно должен быть указан"
-				return m, nil, false
-			}
 			return m, nil, true
 		}
 	}

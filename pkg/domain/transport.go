@@ -12,3 +12,14 @@ type (
 		Err        error
 	}
 )
+
+const (
+	APIv1                  = "/api/v1"
+	RouteUser              = APIv1 + "/user"
+	RouteUserRegistration  = "/registration"
+	RouteUserAuthorization = "/authorization"
+	RouteUserTOTP          = "/totp"
+	RouteUserTOTPUpdate    = "/totp-update"
+	RouteUserSavePassHash  = "/save-hash"
+	RouteSync              = APIv1 + "/sync"
+)
