@@ -16,6 +16,7 @@ import (
 	"gophkeeper/internal/server/repository"
 	"gophkeeper/internal/server/transport"
 	cryptoargon "gophkeeper/pkg/crypto"
+	"gophkeeper/pkg/domain"
 	"gophkeeper/pkg/logger"
 
 	log "github.com/sirupsen/logrus"
@@ -39,13 +40,18 @@ var (
 )
 
 // NewApplication инициализирует сервет
-func NewApplication(domain, httpsport, grpcport, databaseDNS, company, smtphost, smtpport, email string, dropDB bool) (*Application, error) {
+func NewApplication(dropDB bool) (*Application, error) {
 	// Инициализируем логгер.
 	logger := logger.InitializeLogger(&log.JSONFormatter{}, log.InfoLevel, os.Stdout)
 	// Получаем данные о версии и печатаем в os.Stout
 	versionControl()
 	// Инициализируем конфигурацию
-	conf, err := config.InitializeConfigurer(domain, httpsport, grpcport, databaseDNS, company, smtphost, smtpport, email, logger)
+	conf, err := config.InitializeConfigurer(
+		domain.LocalServerAddress,
+		domain.LocalPortHTTPS,
+		domain.LocalPortGRPC,
+		domain.LocalCompanyName,
+		logger)
 	if err != nil {
 		logger.Debug("Сonfiguration initialization error.\nGophKeeper Server is stopped.\n")
 		return nil, err

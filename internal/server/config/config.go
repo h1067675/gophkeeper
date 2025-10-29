@@ -76,18 +76,15 @@ func (n *StringEnv) Check(name string) error {
 //
 // Внимание!!!
 // Секретный ключ необходимый для шифрования данных указывается только в переменной среды GK_SECRET_KEY
+// Путь и пароль базы данных указывается только в переменной среды GK_DATABASE_URI
 // Пароль для отправки почтовых писем указывается только в переменной среды GK_EMAIL_PASSWORD
-func InitializeConfigurer(domain, httpsport, grpcport, db, company, smtphost, smtpport, email string, logger *log.Logger) (conf *Config, err error) {
+func InitializeConfigurer(domain, httpsport, grpcport, company string, logger *log.Logger) (conf *Config, err error) {
 	conf = &Config{Logger: logger}
 	err = errors.Join(
 		conf.Domain.Set(domain),
 		conf.HTTPSPort.Set(httpsport),
 		conf.GRPCPort.Set(grpcport),
-		conf.DatabaseDNS.Set(db),
 		conf.CompanyName.Set(company),
-		conf.SMTPHost.Set(smtphost),
-		conf.SMTPPort.Set(smtpport),
-		conf.Email.Set(email),
 		conf.ParseEnvs(),
 		conf.ParseFlags(),
 	)
@@ -119,7 +116,6 @@ func (c *Config) ParseFlags() error {
 	flag.Var(&c.Domain, "a", "Host for runing servers")
 	flag.Var(&c.HTTPSPort, "b", "Port for runing HTTPS server")
 	flag.Var(&c.GRPCPort, "c", "Port for runing GRPC server")
-	flag.Var(&c.DatabaseDNS, "d", "Data Source Name for accessing the database")
 	flag.Var(&c.CompanyName, "n", "Company name")
 	flag.Var(&c.SMTPHost, "sh", "SMTP email host")
 	flag.Var(&c.SMTPPort, "sp", "SMTP email port")

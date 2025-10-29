@@ -29,7 +29,7 @@ type homeModel struct {
 }
 
 // newHomeModel инициализирует модель экрана основного меню приложения на данном экране можно
-func newHomeModel() homeModel {
+func newHomeModel() *homeModel {
 	items := make([]item, 0)
 	items = append(items, item{title: "Пароли", make: 1})
 	items = append(items, item{title: "Банковские карты", make: 2})
@@ -39,7 +39,7 @@ func newHomeModel() homeModel {
 	items = append(items, item{title: "Выйти", make: -1})
 	// items = append(items, item{title: "Удалить аккаунт", make: 9})
 
-	return homeModel{
+	return &homeModel{
 		keys:  DefaultKeyMap(),
 		items: items,
 		help:  help.New(),

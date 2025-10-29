@@ -51,7 +51,7 @@ const (
 )
 
 // newCardsModel инициализирует модель экран работы с данными банковских карт пользователя
-func newCardsModel() cardsModel {
+func newCardsModel() *cardsModel {
 	var inputs []textinput.Model = make([]textinput.Model, desc+1)
 	inputs[localid] = textinput.New()
 
@@ -99,7 +99,7 @@ func newCardsModel() cardsModel {
 	inputs[desc].Width = 35
 	inputs[desc].Prompt = ""
 
-	return cardsModel{
+	return &cardsModel{
 		keys:   DefaultKeyMap(),
 		help:   help.New(),
 		inputs: inputs,

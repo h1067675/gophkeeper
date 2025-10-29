@@ -5,6 +5,7 @@ package ui
 
 import (
 	"fmt"
+	"gophkeeper/pkg/domain"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -25,7 +26,7 @@ type registerModel struct {
 	err   string
 	focus int
 	done  bool
-	next  int
+	next  domain.Screen
 }
 
 // newRegisterModel инициализирует модель экрана регистрации пользователя
@@ -58,6 +59,7 @@ func newRegisterModel() registerModel {
 		pass2: pass2,
 		email: email,
 		help:  help.New(),
+		next:  -1,
 	}
 }
 
@@ -113,7 +115,7 @@ func (m registerModel) Update(msg tea.Msg) (registerModel, tea.Cmd, bool) {
 			}
 			m.err = "Ошибка! Пароли не соответствуют доуг другу"
 		case "esc":
-			m.next = -1
+			m.next = domain.ScreenLogin
 			return m, nil, true
 		case "ctrl+c":
 			return m, tea.Quit, false

@@ -48,7 +48,7 @@ const (
 )
 
 // newTextModel инициализирует модель экран работы с текстовыми данными пользователя
-func newTextModel() textModel {
+func newTextModel() *textModel {
 	var inputs []textinput.Model = make([]textinput.Model, tdesc+1)
 
 	inputs[tlocalid] = textinput.New()
@@ -78,7 +78,7 @@ func newTextModel() textModel {
 	ta.ShowLineNumbers = false
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
-	return textModel{
+	return &textModel{
 		keys:   DefaultKeyMap(),
 		help:   help.New(),
 		inputs: inputs,

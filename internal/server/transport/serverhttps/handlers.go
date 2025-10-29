@@ -136,7 +136,7 @@ func (s *Server) TOTPUpdateHandler(response http.ResponseWriter, request *http.R
 		return
 	}
 	// формируем ответ в json и отправляем
-	result := domain.JSONRegistrationResponse{Redirect: "/api/user/totp", TOTPurl: totp}
+	result := domain.JSONRegistrationResponse{Redirect: domain.APIv1 + domain.RouteUserTOTP, TOTPurl: totp}
 	body, err := json.Marshal(result)
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
@@ -171,14 +171,14 @@ func (s *Server) UserAuthorizationHandler(response http.ResponseWriter, request 
 		return
 	}
 	// формируем ответ в json
-	result := domain.JSONAuthorizationResponse{Redirect: "/api/user/totp", Token: session, Expire: int(expire.Unix()), SaltB64: saltb64, SPassHash: spassHash}
+	result := domain.JSONAuthorizationResponse{Redirect: domain.APIv1 + domain.RouteUserTOTP, Token: session, Expire: int(expire.Unix()), SaltB64: saltb64, SPassHash: spassHash}
 	statusCode = http.StatusOK
 	if errors.Is(errAuth, errors.ErrTOTPExpired) {
-		result.Redirect = "/api/user/totp-update"
+		result.Redirect = domain.APIv1 + domain.RouteUserTOTPUpdate
 		statusCode = http.StatusTemporaryRedirect
 	}
 	if errors.Is(errAuth, errors.ErrUserSecretPassword) {
-		result.Redirect = "/api/user/save-hash"
+		result.Redirect = domain.APIv1 + domain.RouteUserSavePassHash
 		statusCode = http.StatusTemporaryRedirect
 	}
 
